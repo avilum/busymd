@@ -5,10 +5,10 @@ A **pure bash markdown viewer** for the terminal. Zero dependencies. Works every
 ### Comparison: busymd vs bat
 
 ![busymd vs bat - Example 1](example-1.png)
-*Left: **busymd** (pure bash, zero dependencies) | Right: **bat** *
+*Left: **busymd** (pure bash, zero dependencies) | Right: **cat/less***
 
 ![busymd vs bat - Example 2](example-2.png)
-*Left: **busymd** | Right: **bat***
+*Left: **busymd** | Right: **cat/less***
 
 ### Features
 
