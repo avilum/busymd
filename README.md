@@ -117,20 +117,23 @@ Use it as a standalone script, source it as a bash function, or copy/paste it wh
 ### Examples
 
 ```bash
+# Install with curl
+curl -sL https://raw.githubusercontent.com/avilum/busymd/refs/heads/master/busymd.sh -o ~/.local/bin/busymd && chmod +x ~/.local/bin/busymd.sh
+
 # Quick preview of any GitHub repo's README
-curl -s https://raw.githubusercontent.com/sharkdp/bat/master/README.md | busymd.sh
+curl -s https://raw.githubusercontent.com/avilum/secimport/master/README.md | busymd.sh
 
 # Source it once in your shell, use it anywhere
-source ~/bin/busymd.sh
+source ~/.local/bin/busymd.sh
 busymd README.md
 cat CHANGELOG.md | busymd
 
 # Or with an alias for cleaner syntax
-source ~/bin/busymd.sh && alias md='busymd'
+source ~/.local/bin/busymd.sh && alias md='busymd'
 md README.md
 
 # One-liner wrapper function
-busymd() { bash ~/bin/busymd.sh "$@"; }
+busymd() { bash ~/.local/bin/busymd.sh "$@"; }
 busymd CHANGELOG.md
 
 # Chain with other tools
