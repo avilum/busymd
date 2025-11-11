@@ -2,7 +2,12 @@
 
 A **pure bash markdown viewer** for the terminal. Zero dependencies. Works everywhere.
 
-### Comparison: busymd vs bat
+### Inspiration
+
+Inspired by [bat](https://github.com/sharkdp/bat), [glow](https://github.com/charmbracelet/glow), and the Unix philosophy of doing one thing well.
+
+
+### Comparison: busymd vs cat\less
 
 ![busymd vs bat - Example 1](example-1.png)
 *Left: **busymd** (pure bash, zero dependencies) | Right: **cat/less***
@@ -91,15 +96,23 @@ When using the pager (less), you can:
 
 ### Why?
 
-Sometimes you're on a minimal system. Sometimes you don't want to install Python + dependencies. Sometimes you just want to read a README without leaving the terminal.
+Sometimes all you need is to peek inside a README or markdown file — just to see how it actually renders, understand those code blocks, or check formatting without leaving your terminal.
 
-**busymd** works on:
+I wanted something simple and lean for viewing Markdown — similar to how VSCode or GitHub render `.md` files, but right in the shell. No GUI, no browser, no fuss.
+
+There are great tools out there like `bat`, `glow`, and `mdcat`, but they often come with heavier dependencies or larger codebases. **busymd** focuses on being minimal and fast — just pure bash, under 400 lines, and it works anywhere.
+
+Use it as a standalone script, source it as a bash function, or copy/paste it wherever you need it.
+
+**busymd** runs on:
 - Alpine Linux
 - Busybox
 - Docker containers
-- Old servers
+- Old servers  
 - Your laptop
-- Pretty much anywhere with bash
+- Pretty much anywhere with bash 4.0+
+
+
 
 ### Examples
 
@@ -131,11 +144,9 @@ find . -name "*.md" -exec busymd.sh {} \;
 
 That's it. No pip, npm, gem, cargo, or go install required.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=avilum/busymd&type=date&legend=top-left)](https://www.star-history.com/#avilum/busymd&type=date&legend=top-left)
 ### License
 
 MIT
-
-### Inspiration
-
-Inspired by [bat](https://github.com/sharkdp/bat), [glow](https://github.com/charmbracelet/glow), and the Unix philosophy of doing one thing well.
-
