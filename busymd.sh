@@ -1,41 +1,54 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 # BUSYMD - Markdown Viewer for Busybox and Beyond
 # Pure bash markdown renderer with no external dependencies
 #
 # Usage:
-#   ./busymd.sh FILE.md                        # Run as script
-#   source busymd.sh && busymd FILE.md         # Use as bash function
-#   busymd() { bash /path/to/busymd.sh "$@"; } # Wrapper function
+#   ./busymd.sh FILE.md                        # Run as script directly
+#
+# For ZSH users, add this to ~/.zshrc:
+#   busymd() { bash /Users/avi/git/markdown-viewer-terminal/busymd.sh "$@"; }
+#
+# For BASH users, you can source it:
+#   source busymd.sh && busymd FILE.md
 
-readonly R=$'\033[0m'      # Reset
-readonly B=$'\033[1m'      # Bold
-readonly I=$'\033[3m'      # Italic
-readonly U=$'\033[4m'      # Underline
-readonly S=$'\033[9m'      # Strikethrough
-readonly D=$'\033[2m'      # Dim
+# Only set strict mode when running as script, not when sourcing
+if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
+    set -euo pipefail
+fi
 
-# Authentic Monokai color palette (RGB)
-readonly W=$'\033[38;2;248;248;242m'   # #F8F8F2 - White (bold text, H1)
-readonly Y=$'\033[38;2;230;219;116m'   # #E6DB74 - Yellow (strings, italic)
-readonly G=$'\033[38;2;166;226;46m'    # #A6E22E - Green (code, functions)
-readonly O=$'\033[38;2;253;151;31m'    # #FD971F - Orange (parameters, bold+italic)
-readonly M=$'\033[38;2;174;129;255m'   # #AE81FF - Purple (constants, H3)
-readonly RED=$'\033[38;2;255;120;160m' # Very bright pink for maximum visibility
-readonly C=$'\033[38;2;102;217;239m'   # #66D9EF - Blue (classes, links, borders)
-readonly BL=$'\033[38;2;102;217;239m'  # #66D9EF - Blue (same as C for consistency)
-readonly GR=$'\033[38;2;150;150;130m'  # Lighter gray for comments (more visible)
+# Only define variables if not already set (for sourcing in bashrc/zshrc)
+# Check if R is already defined - if so, skip all initialization
+if [[ -z ${R+x} ]]; then
+    # Never use readonly - it prevents re-sourcing
+    R=$'\033[0m'      # Reset
+    B=$'\033[1m'      # Bold
+    I=$'\033[3m'      # Italic
+    U=$'\033[4m'      # Underline
+    S=$'\033[9m'      # Strikethrough
+    D=$'\033[2m'      # Dim
 
-readonly BG=$'\033[48;2;39;40;34m'     # #272822 - Monokai background (inline code)
-readonly BB=$'\033[48;2;39;40;34m'     # #272822 - Monokai background (code lang tag)
+    # Authentic Monokai color palette (RGB)
+    W=$'\033[38;2;248;248;242m'   # #F8F8F2 - White (bold text, H1)
+    Y=$'\033[38;2;230;219;116m'   # #E6DB74 - Yellow (strings, italic)
+    G=$'\033[38;2;166;226;46m'    # #A6E22E - Green (code, functions)
+    O=$'\033[38;2;253;151;31m'    # #FD971F - Orange (parameters, bold+italic)
+    M=$'\033[38;2;174;129;255m'   # #AE81FF - Purple (constants, H3)
+    RED=$'\033[38;2;255;120;160m' # Very bright pink for maximum visibility
+    C=$'\033[38;2;102;217;239m'   # #66D9EF - Blue (classes, links, borders)
+    BL=$'\033[38;2;102;217;239m'  # #66D9EF - Blue (same as C for consistency)
+    GR=$'\033[38;2;150;150;130m'  # Lighter gray for comments (more visible)
+
+    BG=$'\033[48;2;39;40;34m'     # #272822 - Monokai background (inline code)
+    BB=$'\033[48;2;39;40;34m'     # #272822 - Monokai background (code lang tag)
+fi
 
 in_code=0
 code_num=0
 
 WIDTH=${COLUMNS:-$(tput cols 2>/dev/null || echo 80)}
 
-repeat() {
+repeat_char() {
     local char=$1 count=$2 result=""
     printf -v result '%*s' "$count"
     echo "${result// /$char}"
@@ -187,9 +200,9 @@ render() {
                 lang="${lang# }"  # Trim leading space
                 ((prev_empty == 0)) && echo ""
                 [[ -n $lang ]] && echo "${BB}${W} $lang ${R}"
-                echo "${D}${C}┌$(repeat ─ $((WIDTH-2)))┐${R}"
+                echo "${D}${C}┌$(repeat_char ─ $((WIDTH-2)))┐${R}"
             else
-                echo "${D}${C}└$(repeat ─ $((WIDTH-2)))┘${R}"
+                echo "${D}${C}└$(repeat_char ─ $((WIDTH-2)))┘${R}"
                 in_code=0
             fi
             continue
@@ -269,11 +282,11 @@ render() {
             local lvl=${#BASH_REMATCH[1]} txt="${BASH_REMATCH[2]}"
             echo ""
             case $lvl in
-                1) echo "${B}${C}$(repeat ═ $WIDTH)${R}"
+                1) echo "${B}${C}$(repeat_char ═ $WIDTH)${R}"
                    echo "${B}${RED}$txt${R}"
-                   echo "${B}${C}$(repeat ═ $WIDTH)${R}" ;;
+                   echo "${B}${C}$(repeat_char ═ $WIDTH)${R}" ;;
                 2) echo "${B}${C}$txt${R}"
-                   echo "${C}$(repeat ━ ${#txt})${R}" ;;
+                   echo "${C}$(repeat_char ━ ${#txt})${R}" ;;
                 3) echo "${B}${M}$txt${R}" ;;
                 4) echo "${B}${O}▸ $txt${R}" ;;
                 5) echo "${G}● $txt${R}" ;;
@@ -283,7 +296,7 @@ render() {
         fi
         
         # Horizontal rule: --- or *** or ___
-        [[ $line =~ ^[*_-]{3,}$ ]] && { echo "${D}${C}$(repeat ─ $WIDTH)${R}"; continue; }
+        [[ $line =~ ^[*_-]{3,}$ ]] && { echo "${D}${C}$(repeat_char ─ $WIDTH)${R}"; continue; }
         
         # Admonitions: !!! type "title" or ??? type "title"
         if [[ $line =~ ^(\?\?\?|!!![!]*)[[:space:]]+([a-z]+)([[:space:]]+\"([^\"]+)\")? ]]; then
@@ -338,8 +351,8 @@ render() {
         
         # Tables: | col | col |
         if [[ $line =~ ^\|.*\|$ ]]; then
-            if [[ $line =~ ^\|[[:space:]:|-]+\|$ ]]; then
-                echo "${C}$(repeat ─ $WIDTH)${R}"
+            if [[ $line =~ ^\|[[:space:]:\|\-]+\|$ ]]; then
+                echo "${C}$(repeat_char ─ $WIDTH)${R}"
             else
                 line="${line#|}" line="${line%|}"
                 local output="${C}│${R}" rest="$line" cell
@@ -392,14 +405,14 @@ busymd() {
     
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            -h|--help) help; exit 0 ;;
+            -h|--help) help; return 0 ;;
             --no-pager) use_pager=0; shift ;;
             *) input="$1"; break ;;
         esac
     done
     
-    [[ -z $input ]] && { [[ -p /dev/stdin ]] && input="/dev/stdin" || { help; exit 0; }; }
-    [[ -f $input ]] || [[ $input == /dev/stdin ]] || { echo "Error: File not found: $input" >&2; exit 1; }
+    [[ -z $input ]] && { [[ -p /dev/stdin ]] && input="/dev/stdin" || { help; return 0; }; }
+    [[ -f $input ]] || [[ $input == /dev/stdin ]] || { echo "Error: File not found: $input" >&2; return 1; }
     
     if ((use_pager == 1)) && [[ -t 1 ]]; then
         # Use -I (uppercase) for BusyBox compatibility, omit -X as it's not supported everywhere
