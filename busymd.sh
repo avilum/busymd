@@ -130,7 +130,9 @@ inline() {
     done
     
     # Linked images: [![alt](img-url)](link-url) - MUST be first!
-    while [[ $t =~ \[!\[([^]]*)\]\(([^\)]+)\)\]\(([^\)]+)\) ]]; do
+    # Use variable to avoid bash version regex escaping issues
+    local img_link_pattern='\[!\[([^]]*)\]\(([^)]+)\)\]\(([^)]+)\)'
+    while [[ $t =~ $img_link_pattern ]]; do
         m="${BASH_REMATCH[0]}"
         placeholder="${PH}${placeholder_idx}${PH}"
         replacements[$placeholder_idx]="${M}${U}🖼  ${BASH_REMATCH[1]}${R} ${BL}→${R} ${BL}${BASH_REMATCH[3]}${R}"
@@ -139,7 +141,8 @@ inline() {
     done
     
     # Images: ![alt](url)
-    while [[ $t =~ !\[([^]]*)\]\(([^\)]+)\) ]]; do
+    local img_pattern='!\[([^]]*)\]\(([^)]+)\)'
+    while [[ $t =~ $img_pattern ]]; do
         m="${BASH_REMATCH[0]}"
         placeholder="${PH}${placeholder_idx}${PH}"
         replacements[$placeholder_idx]="${M}🖼  ${BASH_REMATCH[1]}${R} ${D}${C}[${BASH_REMATCH[2]}]${R}"
@@ -148,7 +151,8 @@ inline() {
     done
     
     # Links: [text](url) - Format the link text first!
-    while [[ $t =~ \[([^]]+)\]\(([^\)]+)\) ]]; do
+    local link_pattern='\[([^]]+)\]\(([^)]+)\)'
+    while [[ $t =~ $link_pattern ]]; do
         m="${BASH_REMATCH[0]}"
         link_text=$(format_text "${BASH_REMATCH[1]}")
         placeholder="${PH}${placeholder_idx}${PH}"
@@ -398,7 +402,8 @@ busymd() {
     [[ -f $input ]] || [[ $input == /dev/stdin ]] || { echo "Error: File not found: $input" >&2; exit 1; }
     
     if ((use_pager == 1)) && [[ -t 1 ]]; then
-        render "$input" | less -R -F -X -i -M
+        # Use -I (uppercase) for BusyBox compatibility, omit -X as it's not supported everywhere
+        render "$input" | less -R -F -I -M 2>/dev/null || render "$input" | less -R -F -M
     else
         render "$input"
     fi
