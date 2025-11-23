@@ -147,9 +147,6 @@ find . -name "*.md" -exec busymd.sh {} \;
 
 That's it. No pip, npm, gem, cargo, or go install required.
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=avilum/busymd&type=date&legend=top-left)](https://www.star-history.com/#avilum/busymd&type=date&legend=top-left)
 ### License
 
 MIT
